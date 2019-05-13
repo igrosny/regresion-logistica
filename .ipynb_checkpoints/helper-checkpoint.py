@@ -137,24 +137,40 @@ def get_loss(w1,w2,model,X,y,set_weights):
     return model.evaluate(X,y,verbose=0)[0]
 
 def plotBoundary(data, labels, clf_1, N,degree=False,include_bias=False):
+    """
+    Dibuja un scatter map con los puntos
+    
+    Args:
+        data ([[float, float]]): los valores 
+        labels (int): Unos o ceros
+        clf_1:
+        N :
+        degree (int): El grado del polinomio
+        include_bias (boolean): Si es verdadero, incluye la columna del bias.
+        If True (default), then include a bias column, the feature in which all polynomial powers are zero 
+    """
     class_1 = data[labels == 1]
     class_0 = data[labels == 0]
     N = 300
+    
+    # Busco los minimos y maximos
     mins = data[:,:2].min(axis=0)
     maxs = data[:,:2].max(axis=0)
+    
     x1 = np.linspace(mins[0], maxs[0], N)
     x2 = np.linspace(mins[1], maxs[1], N)
     x1, x2 = np.meshgrid(x1, x2)
-    X=np.c_[x1.flatten(), x2.flatten()]
+    X = np.c_[x1.flatten(), x2.flatten()]
+    
     if degree:
-        poly=PolynomialFeatures(degree,include_bias=include_bias)
-        X=poly.fit_transform(X)
+        poly = PolynomialFeatures(degree, include_bias=include_bias)
+        X = poly.fit_transform(X)
     Z_nn = clf_1.predict_proba(X)[:, 0]
 
     # Put the result into a color plot
     Z_nn = Z_nn.reshape(x1.shape)
     
-    fig = plt.figure(figsize=(20,10))
+    fig = plt.figure(figsize=(20, 10))
     ax = fig.gca()
     cm = plt.cm.RdBu
         
